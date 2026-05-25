@@ -157,6 +157,14 @@ class PersonalFinanceApiIntegrationTests {
     }
 
     @Test
+    void rootHealthEndpointIsPublic() throws Exception {
+        mockMvc.perform(get("/"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("UP"))
+                .andExpect(jsonPath("$.message").value("Personal Finance Manager API is running"));
+    }
+
+    @Test
     void userCategoryTransactionAndGoalErrorPathsReturnExpectedStatuses() throws Exception {
         String username = uniqueEmail("errors");
         String travelCategory = uniqueCategory("Travel");
