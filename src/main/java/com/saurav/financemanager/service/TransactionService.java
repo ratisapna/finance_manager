@@ -13,9 +13,13 @@ import com.saurav.financemanager.exception.BadRequestException;
 import com.saurav.financemanager.exception.NotFoundException;
 import com.saurav.financemanager.repository.CategoryRepository;
 import com.saurav.financemanager.repository.TransactionRepository;
+import jakarta.persistence.criteria.Predicate;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,14 +53,18 @@ public class TransactionService {
             LocalDate startDate,
             LocalDate endDate,
             Long categoryId,
+            String categoryName,
             CategoryType type
     ) {
         User user = currentUserService.getCurrentUser();
         validateDateRange(startDate, endDate);
-        validateCategoryAccess(categoryId, user);
+        Category category = resolveCategoryFilter(categoryId, categoryName, user);
 
         List<TransactionResponse> transactions = transactionRepository
-                .findTransactions(user, startDate, endDate, categoryId, type)
+                .findAll(
+                        buildTransactionSpecification(user, startDate, endDate, category, type),
+                        Sort.by(Sort.Order.desc("transactionDate"), Sort.Order.desc("id"))
+                )
                 .stream()
                 .map(TransactionResponse::from)
                 .toList();
@@ -97,19 +105,62 @@ public class TransactionService {
         return new MessageResponse("Transaction deleted successfully");
     }
 
+    private Specification<Transaction> buildTransactionSpecification(
+            User user,
+            LocalDate startDate,
+            LocalDate endDate,
+            Category category,
+            CategoryType type
+    ) {
+        return (root, query, criteriaBuilder) -> {
+            root.fetch("category");
+
+            List<Predicate> predicates = new ArrayList<>();
+            predicates.add(criteriaBuilder.equal(root.get("user"), user));
+
+            if (startDate != null) {
+                predicates.add(criteriaBuilder.greaterThanOrEqualTo(root.get("transactionDate"), startDate));
+            }
+
+            if (endDate != null) {
+                predicates.add(criteriaBuilder.lessThanOrEqualTo(root.get("transactionDate"), endDate));
+            }
+
+            if (category != null) {
+                predicates.add(criteriaBuilder.equal(root.get("category"), category));
+            }
+
+            if (type != null) {
+                predicates.add(criteriaBuilder.equal(root.get("category").get("type"), type));
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+    }
+
     private void validateDateRange(LocalDate startDate, LocalDate endDate) {
         if (startDate != null && endDate != null && startDate.isAfter(endDate)) {
             throw new BadRequestException("Start date cannot be after end date");
         }
     }
 
-    private void validateCategoryAccess(Long categoryId, User user) {
-        if (categoryId == null) {
-            return;
+    private Category resolveCategoryFilter(Long categoryId, String categoryName, User user) {
+        boolean hasCategoryName = categoryName != null && !categoryName.trim().isEmpty();
+
+        if (categoryId != null && hasCategoryName) {
+            throw new BadRequestException("Use either categoryId or category, not both");
         }
 
-        categoryRepository.findAccessibleById(categoryId, user)
+        if (categoryId != null) {
+            return categoryRepository.findAccessibleById(categoryId, user)
                 .orElseThrow(() -> new BadRequestException("Category not found"));
+        }
+
+        if (hasCategoryName) {
+            return categoryService.findAccessibleByName(categoryName, user);
+        }
+
+        return null;
     }
 
     private String normalizeDescription(String description) {

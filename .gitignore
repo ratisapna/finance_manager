@@ -38,7 +38,6 @@ logs/
 .env.production
 
 application-local.properties
-application.properties
 application-prod.properties
 
 coverage/
