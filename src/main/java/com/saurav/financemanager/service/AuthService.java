@@ -5,11 +5,11 @@ import com.saurav.financemanager.dto.auth.LoginRequest;
 import com.saurav.financemanager.dto.auth.RegisterRequest;
 import com.saurav.financemanager.dto.auth.RegisterResponse;
 import com.saurav.financemanager.entity.User;
+import com.saurav.financemanager.exception.ConflictException;
 import com.saurav.financemanager.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -20,7 +20,6 @@ import org.springframework.security.web.authentication.logout.SecurityContextLog
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +34,7 @@ public class AuthService {
         String username = request.getUsername().trim().toLowerCase();
 
         if (userRepository.existsByUsername(username)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
+            throw new ConflictException("Username already exists");
         }
 
         User user = User.builder()
