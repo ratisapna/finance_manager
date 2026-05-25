@@ -97,9 +97,20 @@ public class GoalService {
         BigDecimal percentage = currentProgress
                 .multiply(ONE_HUNDRED)
                 .divide(goal.getTargetAmount(), 2, RoundingMode.HALF_UP);
+        percentage = formatProgressPercentage(percentage);
         BigDecimal remainingAmount = goal.getTargetAmount().subtract(currentProgress).max(BigDecimal.ZERO);
 
         return GoalResponse.from(goal, currentProgress, percentage, remainingAmount);
+    }
+
+    private BigDecimal formatProgressPercentage(BigDecimal percentage) {
+        BigDecimal stripped = percentage.stripTrailingZeros();
+
+        if (stripped.scale() <= 0) {
+            return stripped.setScale(1, RoundingMode.UNNECESSARY);
+        }
+
+        return stripped;
     }
 
     private BigDecimal calculateProgress(SavingsGoal goal) {
