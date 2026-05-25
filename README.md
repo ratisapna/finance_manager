@@ -225,6 +225,25 @@ The project includes:
 
 ---
 
+## Test Coverage
+
+The project includes:
+
+* Unit Tests
+* Integration Tests
+* API Validation Tests
+
+JaCoCo was used to measure code coverage.
+
+### Coverage Summary
+
+* Instruction Coverage: **90%**
+* Branch Coverage: **68%**
+
+![Coverage Report](images/coverage.png)
+
+---
+
 # Deployment
 
 The application is deployable on:
