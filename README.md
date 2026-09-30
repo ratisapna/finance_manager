@@ -240,8 +240,6 @@ JaCoCo was used to measure code coverage.
 * Instruction Coverage: **90%**
 * Branch Coverage: **68%**
 
-![Coverage Report](images/coverage.png)
-
 ---
 
 # Deployment
