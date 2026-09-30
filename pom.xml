@@ -8,7 +8,7 @@
 		<version>3.5.14</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.saurav</groupId>
+	<groupId>com.ratisapna</groupId>
 	<artifactId>financemanager</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name/>
@@ -56,6 +56,11 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
 			<scope>runtime</scope>
 		</dependency>
 		<dependency>
@@ -131,8 +136,8 @@
 				<version>0.8.13</version>
 				<configuration>
 					<includes>
-						<include>com/saurav/financemanager/*</include>
-						<include>com/saurav/financemanager/**/*</include>
+						<include>com/ratisapna/financemanager/*</include>
+						<include>com/ratisapna/financemanager/**/*</include>
 					</includes>
 					<excludes>
 						<exclude>*Hibernate*</exclude>

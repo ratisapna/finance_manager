@@ -256,7 +256,7 @@ The application is deployable on:
 
 # Author
 
-Saurav Sagar
+Ratisapna
 
-* GitHub: https://github.com/Hacker-maverick
-* LinkedIn: https://www.linkedin.com/in/saurav-sagar-25a286290
+* GitHub: https://github.com/ratisapna
+* LinkedIn: https://www.linkedin.com/in/ratisapna
